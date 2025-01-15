@@ -1,18 +1,18 @@
 from flask import Flask, jsonify, request
 import mysql.connector
 from mysql.connector import Error
-
+import os
 app = Flask(__name__)
 
 # Conexión a la base de datos MySQL
 def connect_to_db():
     try:
         conn = mysql.connector.connect(
-            host="localhost",
-            database="CustomerDeleteDb",
-            user="root",  # Cambia según tu configuración
-            password="dani0919"  # Cambia según tu configuración
-        )
+           host=os.getenv("DB_HOST"),
+            database=os.getenv("DB_DELETE_DATABASE"),
+            user=os.getenv("DB_USER"),
+            password=os.getenv("DB_PASSWORD")
+       )
         if conn.is_connected():
             return conn
     except Error as e:
