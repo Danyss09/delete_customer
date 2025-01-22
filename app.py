@@ -1,41 +1,10 @@
-from flask import Flask, jsonify, request
-import mysql.connector
-from mysql.connector import Error
-import os
+from flask import Flask
+from controllers.customer_controller import customer_controller
+
 app = Flask(__name__)
 
-# Conexión a la base de datos MySQL
-def connect_to_db():
-    try:
-        conn = mysql.connector.connect(
-           host=os.getenv("DB_HOST"),
-            database=os.getenv("DB_DELETE_DATABASE"),
-            user=os.getenv("DB_USER"),
-            password=os.getenv("DB_PASSWORD")
-       )
-        if conn.is_connected():
-            return conn
-    except Error as e:
-        print(f"Error al conectar a MySQL: {e}")
-        return None
+# Registrar el blueprint
+app.register_blueprint(customer_controller)
 
-# Endpoint para eliminar un cliente
-@app.route('/customer/<int:customer_id>', methods=['DELETE'])
-def delete_customer(customer_id):
-    conn = connect_to_db()
-    if conn:
-        cursor = conn.cursor()
-        cursor.execute("DELETE FROM Customers WHERE CustomerID = %s", (customer_id,))
-        conn.commit()
-        rows_deleted = cursor.rowcount
-        cursor.close()
-        conn.close()
-        if rows_deleted > 0:
-            return jsonify({"message": "Customer deleted successfully!"}), 200
-        else:
-            return jsonify({"message": "Customer not found"}), 404
-    return jsonify({"message": "Failed to connect to database"}), 500
-
-# Iniciar la aplicación
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000)
