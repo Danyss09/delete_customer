@@ -1,5 +1,5 @@
 from flask import Flask
-from controllers.customer_controller import customer_controller
+from routes.customer_controller import customer_controller
 
 app = Flask(__name__)
 
