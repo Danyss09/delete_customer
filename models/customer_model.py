@@ -1,27 +1,15 @@
-from flask import Blueprint, request, jsonify
-from models.customer_model import delete_customer
-from services.db_config import get_connection, read_customer
+from services.db_config import get_connection
 
-customer_controller = Blueprint('customer_controller', __name__)
-
-# Ruta para eliminar un cliente
-@customer_controller.route('/delete_customer', methods=['DELETE'])
-def delete_customer_route():
-    customer_id = request.args.get('customer_id')
-    
-    if not customer_id:
-        return jsonify({'error': 'No customer_id provided'}), 400
-    
+def delete_customer(customer_id):
+    connection = get_connection()
+    cursor = connection.cursor()
     try:
-        # Llamar al método read_customer antes de eliminar
-        customer = read_customer(customer_id)
-        if not customer:
-            return jsonify({'error': 'Customer not found'}), 404
-        
-        result = delete_customer(customer_id)
-        if result:
-            return jsonify({'message': f'Customer {customer_id} deleted successfully.'}), 200
-        else:
-            return jsonify({'error': 'Customer not found'}), 404
+        cursor.execute("DELETE FROM customers WHERE id = %s", (customer_id,))
+        connection.commit()
+        return cursor.rowcount > 0
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        print(f"Error deleting customer: {e}")
+        return False
+    finally:
+        cursor.close()
+        connection.close()

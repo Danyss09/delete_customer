@@ -18,7 +18,7 @@ def delete_customer_route():
         if not customer:
             return jsonify({'error': 'Customer not found'}), 404
         
-        result = delete_customer(customer_id)
+        result = delete_customer(int(customer_id))
         if result:
             return jsonify({'message': f'Customer {customer_id} deleted successfully.'}), 200
         else:
