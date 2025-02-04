@@ -4,7 +4,7 @@ def delete_customer(customer_id):
     connection = get_connection()
     cursor = connection.cursor()
     try:
-        cursor.execute("DELETE FROM customers WHERE id = %s", (customer_id,))
+        cursor.execute("DELETE FROM Customers WHERE customerid = %s", (customer_id,))
         connection.commit()
         return cursor.rowcount > 0
     except Exception as e:
