@@ -16,7 +16,7 @@ def get_connection():
     )
 
 def read_customer(customer_id):
-    url = f"http://52.90.158.103:5000/get_customer/{customer_id}"
+    url = f"http://3.227.130.252:5000/get_customer/{customer_id}"
     response = requests.get(url)
     if response.status_code == 200:
         return response.json()
