@@ -1,20 +1,27 @@
-import pymysql
-from services.db_config import get_connection
+from flask import Blueprint, request, jsonify
+from models.customer_model import delete_customer
+from services.db_config import get_connection, read_customer
 
-def delete_customer(customer_id):
-    connection = get_connection()
+customer_controller = Blueprint('customer_controller', __name__)
+
+# Ruta para eliminar un cliente
+@customer_controller.route('/delete_customer', methods=['DELETE'])
+def delete_customer_route():
+    customer_id = request.args.get('customer_id')
+    
+    if not customer_id:
+        return jsonify({'error': 'No customer_id provided'}), 400
+    
     try:
-        with connection.cursor() as cursor:
-            # SQL para eliminar un cliente de la base de datos
-            sql = "DELETE FROM Customers WHERE CustomerID = %s"
-            cursor.execute(sql, (customer_id,))
-            connection.commit()
-            
-            if cursor.rowcount > 0:
-                return True  # Cliente eliminado
-            else:
-                return False  # Cliente no encontrado
+        # Llamar al método read_customer antes de eliminar
+        customer = read_customer(customer_id)
+        if not customer:
+            return jsonify({'error': 'Customer not found'}), 404
+        
+        result = delete_customer(customer_id)
+        if result:
+            return jsonify({'message': f'Customer {customer_id} deleted successfully.'}), 200
+        else:
+            return jsonify({'error': 'Customer not found'}), 404
     except Exception as e:
-        raise Exception(f"Error deleting customer: {str(e)}")
-    finally:
-        connection.close()
+        return jsonify({'error': str(e)}), 500
